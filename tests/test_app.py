@@ -1,11 +1,11 @@
 from fastapi import status
 
 
-def test_root_deve_retornar_200_e_ola_mundo(client):
+def test_get_root_should_return_200_and_hello_world(client):
     response = client.get('/')
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {'message': 'Olá Mundo!'}
+    assert response.json() == {'message': 'Hello World!'}
 
 
 def test_create_user(client):
