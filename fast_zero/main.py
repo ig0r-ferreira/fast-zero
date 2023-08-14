@@ -26,7 +26,7 @@ def create_user(user: UserIn, session: Session = Depends(get_session)):
             detail='Username already registered',
         )
 
-    db_user = User(name=user.name, password=user.password, email=user.email)
+    db_user = User(**user.model_dump())
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
@@ -53,9 +53,8 @@ def update_user(
             status_code=status.HTTP_404_NOT_FOUND, detail='User not found'
         )
 
-    db_user.name = user.name
-    db_user.password = user.password
-    db_user.email = user.email
+    for key, value in user.model_dump().items():
+        setattr(db_user, key, value)
 
     session.commit()
     session.refresh(db_user)
