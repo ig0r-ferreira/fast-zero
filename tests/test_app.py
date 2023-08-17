@@ -14,7 +14,7 @@ def test_create_new_user(client):
     response = client.post(
         '/users/',
         json={
-            'name': 'alice',
+            'username': 'alice',
             'email': 'alice@example.com',
             'password': 'secret',
         },
@@ -23,7 +23,7 @@ def test_create_new_user(client):
     assert response.status_code == status.HTTP_201_CREATED
     assert response.json() == {
         'id': 1,
-        'name': 'alice',
+        'username': 'alice',
         'email': 'alice@example.com',
     }
 
@@ -32,7 +32,7 @@ def test_create_user_that_already_exists(client, new_user):
     response = client.post(
         '/users/',
         json={
-            'name': new_user.name,
+            'username': new_user.username,
             'email': 'alice@example.com',
             'password': 'secret',
         },
@@ -62,7 +62,7 @@ def test_update_existing_user(client, new_user):
     response = client.put(
         f'/users/{new_user.id}',
         json={
-            'name': 'bob',
+            'username': 'bob',
             'email': 'bob@example.com',
             'password': 'mynewpassword',
         },
@@ -71,7 +71,7 @@ def test_update_existing_user(client, new_user):
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         'id': 1,
-        'name': 'bob',
+        'username': 'bob',
         'email': 'bob@example.com',
     }
 
@@ -80,7 +80,7 @@ def test_update_non_existent_user(client):
     response = client.put(
         '/users/1',
         json={
-            'name': 'bob',
+            'username': 'bob',
             'email': 'bob@example.com',
             'password': 'mynewpassword',
         },

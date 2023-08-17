@@ -2,14 +2,14 @@ from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class UserIn(BaseModel):
-    name: str
+    username: str
     email: EmailStr
     password: str
 
 
 class UserOut(BaseModel):
     id: int
-    name: str
+    username: str
     email: EmailStr
     model_config = ConfigDict(from_attributes=True)
 

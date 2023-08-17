@@ -18,7 +18,7 @@ def get_root():
     '/users/', status_code=status.HTTP_201_CREATED, response_model=UserOut
 )
 def create_user(user: UserIn, session: Session = Depends(get_session)):
-    db_user = session.scalar(select(User.name == user.name))
+    db_user = session.scalar(select(User.username == user.username))
 
     if db_user:
         raise HTTPException(
