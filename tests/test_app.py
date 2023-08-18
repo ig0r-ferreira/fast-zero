@@ -1,3 +1,4 @@
+import pytest
 from fastapi import status
 
 from fast_zero.schemas import UserOut
@@ -58,9 +59,10 @@ def test_get_users_when_database_is_not_empty(client, new_user):
     assert response.json() == {'users': [user]}
 
 
-def test_update_existing_user(client, new_user):
+def test_update_existing_user(client, new_user, token):
     response = client.put(
         f'/users/{new_user.id}',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'bob',
             'email': 'bob@example.com',
@@ -76,9 +78,10 @@ def test_update_existing_user(client, new_user):
     }
 
 
-def test_update_non_existent_user(client):
+def test_update_another_user(client, token):
     response = client.put(
-        '/users/1',
+        '/users/2',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'bob',
             'email': 'bob@example.com',
@@ -86,18 +89,54 @@ def test_update_non_existent_user(client):
         },
     )
 
-    assert response.status_code == status.HTTP_404_NOT_FOUND
-    assert response.json() == {'detail': 'User not found'}
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.json() == {'detail': 'Not enough permissions'}
 
 
-def test_delete_existing_user(client, new_user):
-    response = client.delete(f'/users/{new_user.id}')
+def test_delete_existing_user(client, new_user, token):
+    response = client.delete(
+        f'/users/{new_user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
-def test_delete_non_existent_user(client):
-    response = client.delete('/users/1')
+def test_delete_another_user(client, token):
+    response = client.delete(
+        '/users/2',
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
-    assert response.status_code == status.HTTP_404_NOT_FOUND
-    assert response.json() == {'detail': 'User not found'}
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.json() == {'detail': 'Not enough permissions'}
+
+
+def test_get_token_for_valid_user(client, new_user):
+    response = client.post(
+        '/token',
+        data={'username': new_user.email, 'password': new_user.raw_password},
+    )
+
+    token = response.json()
+
+    assert response.status_code == status.HTTP_200_OK
+    assert 'access_token' in token
+    assert 'token_type' in token
+
+
+@pytest.mark.parametrize(
+    'username, password',
+    [
+        ('invalidemail@test.com', 'p@$$w0rd'),
+        ('foobar@test.com', 'incorrectpassword'),
+    ],
+)
+def test_get_token_for_invalid_user_data(client, new_user, username, password):
+    response = client.post(
+        '/token',
+        data={'username': username, 'password': password},
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.json() == {'detail': 'Incorrect email or password'}

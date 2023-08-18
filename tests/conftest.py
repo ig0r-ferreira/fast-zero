@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from fast_zero.database import get_session
 from fast_zero.main import app
 from fast_zero.models import Base, User
+from fast_zero.security import get_password_hash
 
 
 @pytest.fixture
@@ -39,9 +40,26 @@ def client(session):
 
 @pytest.fixture
 def new_user(session):
-    user = User(username='FooBar', email='foobar@test.com', password='f00b@r')
+    password = 'f00b@r'
+    user = User(
+        username='FooBar',
+        email='foobar@test.com',
+        password=get_password_hash(password),
+    )
     session.add(user)
     session.commit()
     session.refresh(user)
 
+    setattr(user, 'raw_password', password)
+
     return user
+
+
+@pytest.fixture
+def token(client, new_user):
+    response = client.post(
+        '/token',
+        data={'username': new_user.email, 'password': new_user.raw_password},
+    )
+
+    return response.json().get('access_token')
