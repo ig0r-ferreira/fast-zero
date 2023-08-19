@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -7,10 +9,12 @@ from fast_zero.schemas import UserIn, UserList, UserOut
 from fast_zero.security import get_current_user, get_password_hash, get_session
 
 router = APIRouter(prefix='/users', tags=['users'])
+Session = Annotated[Session, Depends(get_session)]
+CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=UserOut)
-def create_user(user: UserIn, session: Session = Depends(get_session)):
+def create_user(user: UserIn, session: Session):
     db_user = session.scalar(select(User.username == user.username))
 
     if db_user:
@@ -32,9 +36,7 @@ def create_user(user: UserIn, session: Session = Depends(get_session)):
 
 
 @router.get('/', response_model=UserList)
-def get_users(
-    skip: int = 0, limit: int = 100, session: Session = Depends(get_session)
-):
+def get_users(session: Session, skip: int = 0, limit: int = 100):
     users = session.scalars(select(User).offset(skip).limit(limit)).all()
 
     return {'users': users}
@@ -44,8 +46,8 @@ def get_users(
 def update_user(
     user_id: int,
     user: UserIn,
-    session: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user),
+    session: Session,
+    current_user: CurrentUser,
 ):
     if user_id != current_user.id:
         raise HTTPException(
@@ -65,8 +67,8 @@ def update_user(
 @router.delete('/{user_id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(
     user_id: int,
-    session: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user),
+    session: Session,
+    current_user: CurrentUser,
 ):
     if user_id != current_user.id:
         raise HTTPException(
