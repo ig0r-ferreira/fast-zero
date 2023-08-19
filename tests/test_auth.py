@@ -2,10 +2,10 @@ import pytest
 from fastapi import status
 
 
-def test_get_token_for_valid_user(client, new_user):
+def test_get_token_for_valid_user(client, user):
     response = client.post(
         '/token',
-        data={'username': new_user.email, 'password': new_user.raw_password},
+        data={'username': user.email, 'password': user.raw_password},
     )
 
     token = response.json()
@@ -22,7 +22,7 @@ def test_get_token_for_valid_user(client, new_user):
         ('foobar@test.com', 'incorrectpassword'),
     ],
 )
-def test_get_token_for_invalid_user_data(client, new_user, username, password):
+def test_get_token_for_invalid_user_data(client, user, username, password):
     response = client.post(
         '/token',
         data={'username': username, 'password': password},

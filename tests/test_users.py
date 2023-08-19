@@ -21,11 +21,11 @@ def test_create_new_user(client):
     }
 
 
-def test_create_user_that_already_exists(client, new_user):
+def test_create_user_that_already_exists(client, user):
     response = client.post(
         '/users/',
         json={
-            'username': new_user.username,
+            'username': user.username,
             'email': 'alice@example.com',
             'password': 'secret',
         },
@@ -42,18 +42,18 @@ def test_get_users_when_database_is_empty(client):
     assert response.json() == {'users': []}
 
 
-def test_get_users_when_database_is_not_empty(client, new_user):
-    user = UserOut.model_validate(new_user).model_dump()
+def test_get_users_when_database_is_not_empty(client, user):
+    user_data = UserOut.model_validate(user).model_dump()
 
     response = client.get('/users/')
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {'users': [user]}
+    assert response.json() == {'users': [user_data]}
 
 
-def test_update_existing_user(client, new_user, token):
+def test_update_existing_user(client, user, token):
     response = client.put(
-        f'/users/{new_user.id}',
+        f'/users/{user.id}',
         headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'bob',
@@ -64,15 +64,15 @@ def test_update_existing_user(client, new_user, token):
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
-        'id': 1,
+        'id': user.id,
         'username': 'bob',
         'email': 'bob@example.com',
     }
 
 
-def test_update_another_user(client, token):
+def test_update_wrong_user(client, other_user, token):
     response = client.put(
-        '/users/2',
+        f'/users/{other_user.id}',
         headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'bob',
@@ -85,18 +85,18 @@ def test_update_another_user(client, token):
     assert response.json() == {'detail': 'Not enough permissions'}
 
 
-def test_delete_existing_user(client, new_user, token):
+def test_delete_existing_user(client, user, token):
     response = client.delete(
-        f'/users/{new_user.id}',
+        f'/users/{user.id}',
         headers={'Authorization': f'Bearer {token}'},
     )
 
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
-def test_delete_another_user(client, token):
+def test_delete_wrong_user(client, other_user, token):
     response = client.delete(
-        '/users/2',
+        f'/users/{other_user.id}',
         headers={'Authorization': f'Bearer {token}'},
     )
 
