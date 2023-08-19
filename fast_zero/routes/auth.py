@@ -9,6 +9,7 @@ from fast_zero.models import User
 from fast_zero.schemas import Token
 from fast_zero.security import (
     create_access_token,
+    get_current_user,
     get_session,
     verify_password,
 )
@@ -16,6 +17,12 @@ from fast_zero.security import (
 router = APIRouter(tags=['token'])
 OAuth2Form = Annotated[OAuth2PasswordRequestForm, Depends()]
 Session = Annotated[Session, Depends(get_session)]
+CurrentUser = Annotated[User, Depends(get_current_user)]
+
+
+def create_token_response(data):
+    access_token = create_access_token(data=data)
+    return {'access_token': access_token, 'token_type': 'bearer'}
 
 
 @router.post('/token', response_model=Token)
@@ -31,6 +38,9 @@ def login_for_access_token(
             detail='Incorrect email or password',
         )
 
-    access_token = create_access_token(data={'sub': user.email})
+    return create_token_response({'sub': user.email})
 
-    return {'access_token': access_token, 'token_type': 'bearer'}
+
+@router.post('/refresh_token', response_model=Token)
+def refresh_access_token(user: CurrentUser):
+    return create_token_response({'sub': user.email})
