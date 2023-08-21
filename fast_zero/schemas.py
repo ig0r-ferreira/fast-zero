@@ -40,3 +40,7 @@ class TodoOut(BaseModel):
     title: str
     description: str
     state: TodoState
+
+
+class TodoList(BaseModel):
+    todos: list[TodoOut]
