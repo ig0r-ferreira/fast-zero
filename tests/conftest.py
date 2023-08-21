@@ -97,3 +97,14 @@ def token(client, user):
     )
 
     return response.json().get('access_token')
+
+
+@pytest.fixture
+def todo(session, user):
+    todo = TodoFactory(user_id=user.id)
+
+    session.add(todo)
+    session.commit()
+    session.refresh(todo)
+
+    return todo

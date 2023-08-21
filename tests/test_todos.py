@@ -120,11 +120,7 @@ def test_list_todos_using_combined_filters(session, user, client, token):
     assert len(response.json()['todos']) == 5
 
 
-def test_update_todo(session, user, client, token):
-    todo = TodoFactory(user_id=user.id)
-    session.add(todo)
-    session.commit()
-
+def test_update_todo(todo, client, token):
     response = client.patch(
         f'/todos/{todo.id}',
         headers={'Authorization': f'Bearer {token}'},
@@ -145,6 +141,23 @@ def test_update_non_existing_todo(client, token):
         '/todos/1',
         headers={'Authorization': f'Bearer {token}'},
         json={'title': 'Error'},
+    )
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json() == {'detail': 'Task not found.'}
+
+
+def test_delete_todo(todo, client, token):
+    response = client.delete(
+        f'/todos/{todo.id}', headers={'Authorization': f'Bearer {token}'}
+    )
+
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+
+
+def test_delete_non_existing_todo(client, token):
+    response = client.delete(
+        '/todos/1', headers={'Authorization': f'Bearer {token}'}
     )
 
     assert response.status_code == status.HTTP_404_NOT_FOUND

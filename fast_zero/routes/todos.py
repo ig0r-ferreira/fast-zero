@@ -72,3 +72,18 @@ def update_todo(
     session.refresh(stored_todo)
 
     return stored_todo
+
+
+@router.delete('/{todo_id}', status_code=status.HTTP_204_NO_CONTENT)
+def delete_todo(todo_id: int, session: Session, user: CurrentUser):
+    stored_todo = session.scalar(
+        select(Todo).where(Todo.id == todo_id, Todo.user_id == user.id)
+    )
+
+    if not stored_todo:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='Task not found.'
+        )
+
+    session.delete(stored_todo)
+    session.commit()
