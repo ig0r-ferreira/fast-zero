@@ -44,3 +44,9 @@ class TodoOut(BaseModel):
 
 class TodoList(BaseModel):
     todos: list[TodoOut]
+
+
+class PartialTodo(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    state: TodoState | None = None
