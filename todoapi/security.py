@@ -8,10 +8,10 @@ from passlib.context import CryptContext
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from fast_zero.database import get_session
-from fast_zero.models import User
-from fast_zero.schemas import TokenData
-from fast_zero.settings import Settings
+from todoapi.database import get_session
+from todoapi.models import User
+from todoapi.schemas import TokenData
+from todoapi.settings import Settings
 
 settings = Settings()
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')

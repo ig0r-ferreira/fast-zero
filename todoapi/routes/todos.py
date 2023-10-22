@@ -4,10 +4,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from fast_zero.database import get_session
-from fast_zero.models import Todo, User
-from fast_zero.schemas import PartialTodo, TodoIn, TodoList, TodoOut
-from fast_zero.security import get_current_user
+from todoapi.database import get_session
+from todoapi.models import Todo, User
+from todoapi.schemas import PartialTodo, TodoIn, TodoList, TodoOut
+from todoapi.security import get_current_user
 
 router = APIRouter(prefix='/todos', tags=['todos'])
 Session = Annotated[Session, Depends(get_session)]

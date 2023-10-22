@@ -1,6 +1,6 @@
 from fastapi import status
 
-from fast_zero.schemas import UserOut
+from todoapi.schemas import UserOut
 
 
 def test_create_new_user(client):

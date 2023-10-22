@@ -1,7 +1,7 @@
 from fastapi import status
 
-from fast_zero.models import TodoState
 from tests.conftest import TodoFactory
+from todoapi.models import TodoState
 
 
 def test_create_todo(client, token):

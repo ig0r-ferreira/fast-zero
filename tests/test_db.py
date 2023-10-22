@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from fast_zero.models import Todo, User
+from todoapi.models import Todo, User
 
 
 def test_create_user(session: Session):

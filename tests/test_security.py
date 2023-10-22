@@ -1,7 +1,7 @@
 from jose import jwt
 
-from fast_zero.security import create_access_token
-from fast_zero.settings import Settings
+from todoapi.security import create_access_token
+from todoapi.settings import Settings
 
 settings = Settings()
 

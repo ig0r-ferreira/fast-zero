@@ -5,10 +5,10 @@ from fastapi.testclient import TestClient
 from sqlalchemy import StaticPool, create_engine
 from sqlalchemy.orm import sessionmaker
 
-from fast_zero.database import get_session
-from fast_zero.main import app
-from fast_zero.models import Base, Todo, TodoState, User
-from fast_zero.security import get_password_hash
+from todoapi.database import get_session
+from todoapi.main import app
+from todoapi.models import Base, Todo, TodoState, User
+from todoapi.security import get_password_hash
 
 
 class UserFactory(factory.Factory):
