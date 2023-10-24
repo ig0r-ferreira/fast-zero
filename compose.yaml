@@ -1,0 +1,17 @@
+services:
+  api:
+    image: todoapi:latest
+    build: .
+    container_name: todoapi
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: "sqlite:///data/todos.db"
+      SECRET_KEY: ${SECRET_KEY}
+      ALGORITHM: "HS256"
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+    volumes:
+      - database:/app/data
+
+volumes:
+  database:

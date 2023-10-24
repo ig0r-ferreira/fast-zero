@@ -1,11 +1,22 @@
-# Created by https://www.toptal.com/developers/gitignore/api/python
-# Edit at https://www.toptal.com/developers/gitignore?templates=python
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+compose.yml
+compose.yaml
+docker-compose.yml
+docker-compose.yaml
+Dockerfile
+.docker
+.dockerignore
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
 
 # C extensions
 *.so
@@ -175,7 +186,3 @@ pyrightconfig.json
 
 # database directory
 data/
-
-# End of https://www.toptal.com/developers/gitignore/api/python
-
-# Generated using ignr.py - github.com/Antrikshy/ignr.py
