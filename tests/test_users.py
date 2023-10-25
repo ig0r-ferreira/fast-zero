@@ -1,6 +1,8 @@
 from fastapi import status
 
+from todoapi.models import User
 from todoapi.schemas import UserOut
+from todoapi.security import verify_password
 
 
 def test_create_new_user(client):
@@ -51,23 +53,27 @@ def test_get_users_when_database_is_not_empty(client, user):
     assert response.json() == {'users': [user_data]}
 
 
-def test_update_existing_user(client, user, token):
+def test_update_existing_user(client, user, token, session):
+    payload = {
+        'username': 'bob',
+        'email': 'bob@example.com',
+        'password': 'mynewpassword',
+    }
     response = client.put(
         f'/users/{user.id}',
         headers={'Authorization': f'Bearer {token}'},
-        json={
-            'username': 'bob',
-            'email': 'bob@example.com',
-            'password': 'mynewpassword',
-        },
+        json=payload,
     )
 
+    result = response.json()
+
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {
-        'id': user.id,
-        'username': 'bob',
-        'email': 'bob@example.com',
-    }
+    assert result.pop('id') == user.id
+    assert verify_password(
+        payload.pop('password'), session.get(User, user.id).password
+    )
+    for field, value in payload.items():
+        assert result[field] == value
 
 
 def test_update_wrong_user(client, other_user, token):

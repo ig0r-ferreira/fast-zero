@@ -55,7 +55,9 @@ def update_user(
             detail='Not enough permissions',
         )
 
-    for field, value in user.model_dump().items():
+    current_user.password = get_password_hash(user.password)
+
+    for field, value in user.model_dump(exclude={'password'}).items():
         setattr(current_user, field, value)
 
     session.commit()
