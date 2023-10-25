@@ -70,7 +70,7 @@ def user(session):
     session.commit()
     session.refresh(user)
 
-    setattr(user, 'raw_password', password)
+    setattr(user, 'plain_password', password)
 
     return user
 
@@ -84,7 +84,7 @@ def other_user(session):
     session.commit()
     session.refresh(user)
 
-    setattr(user, 'raw_password', password)
+    setattr(user, 'plain_password', password)
 
     return user
 
@@ -92,8 +92,8 @@ def other_user(session):
 @pytest.fixture
 def token(client, user):
     response = client.post(
-        '/token',
-        data={'username': user.email, 'password': user.raw_password},
+        '/auth/token',
+        data={'username': user.email, 'password': user.plain_password},
     )
 
     return response.json().get('access_token')
