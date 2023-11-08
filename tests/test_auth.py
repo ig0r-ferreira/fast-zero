@@ -1,6 +1,28 @@
 from fastapi import status
 from freezegun import freeze_time
 
+from todoapi.security import oauth2_scheme
+
+
+def test_token_url_defined_in_oauth2_scheme(client, user):
+    token_url = (
+        oauth2_scheme.model.model_dump()
+        .get('flows', {})
+        .get('password', {})
+        .get('tokenUrl')
+    )
+
+    response = client.post(
+        token_url,
+        data={'username': user.email, 'password': user.plain_password},
+    )
+
+    result = response.json()
+
+    assert response.status_code == status.HTTP_200_OK
+    assert result.get('access_token')
+    assert result.get('token_type', '') == 'bearer'
+
 
 def test_get_token_for_existing_user(client, user):
     response = client.post(
